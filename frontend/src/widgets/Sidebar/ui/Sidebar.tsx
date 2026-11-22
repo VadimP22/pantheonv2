@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import emerald from '@imumd/mcicons/definitions/emerald'
 import chestMinecart from '@imumd/mcicons/definitions/chest-minecart'
 import { SidebarButton } from '../../../entities/SidebarComponents/ui/sidebarButton.tsx'
+import AppThemeSwitcher from '../../../features/theme/ui/AppThemeSwitcher.tsx'
 import styles from './Sidebar.module.css'
 
 export type SidebarSection = 'overview' | 'stockpiles'
@@ -29,6 +30,9 @@ export function Sidebar() {
           onClick={() => navigate(to)}
         />
       ))}
+      <div className={styles.footer}>
+        <AppThemeSwitcher />
+      </div>
     </nav>
   )
 }

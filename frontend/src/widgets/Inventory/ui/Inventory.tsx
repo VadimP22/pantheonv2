@@ -111,7 +111,7 @@ export function Inventory({ stockpileId, pageSize = 27, className, onDeposit }: 
 
             <div className={styles.detailActions}>
               <AppButton disabled={!selectedItem} onClick={handleDeposit}>
-                {'внести этот ресурс'}
+                {'Внести'}
               </AppButton>
             </div>
           </div>

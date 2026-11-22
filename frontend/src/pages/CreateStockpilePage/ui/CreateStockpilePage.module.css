@@ -16,7 +16,7 @@
 .label {
   margin: 0;
   font-size: 13px;
-  color: #293123;
+  color: var(--text);
 }
 
 .coords {
@@ -27,6 +27,6 @@
 
 .error {
   margin: 0;
-  color: #a33;
+  color: var(--error);
   font-size: 13px;
 }

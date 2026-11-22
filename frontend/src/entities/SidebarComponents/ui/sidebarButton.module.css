@@ -9,7 +9,7 @@
   cursor: pointer;
   font: inherit;
   font-weight: 400;
-  color: #cdd4c3;
+  color: var(--text-on-dark);
   text-align: left;
   border: none;
   outline: none;
@@ -21,7 +21,7 @@
 
 /* Полупрозрачный белый фон при наведении на обычное состояние. */
 .root:not(.selected):hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--hover-nav);
 }
 
 .content {
@@ -41,8 +41,8 @@
 }
 
 .selected {
-  background: #567c36;
-  color: #ffffff;
+  background: var(--accent-nav-selected);
+  color: var(--text-on-accent);
   font-weight: 600;
 }
 
@@ -54,9 +54,9 @@
   bottom: 0;
   left: 0;
   width: 4px;
-  background: #c5ed8d;
+  background: var(--accent-nav-stripe);
 }
 
 .selected:hover {
-  background: #628c3f;
+  background: var(--accent-nav-selected-hover);
 }

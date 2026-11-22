@@ -5,10 +5,10 @@
   justify-content: center;
   height: 40px;
   padding: 0 40px;
-  background: #e0e2d4;
-  border: 1px solid #929986;
+  background: var(--bg-card-secondary);
+  border: 1px solid var(--border);
   box-sizing: border-box;
-  color: #293123;
+  color: var(--text);
   font-size: 14pt;
   line-height: 1;
   cursor: pointer;
@@ -18,17 +18,17 @@
 }
 
 .root:hover {
-  background: #e7e9dc; /* чуть светлее default */
+  background: var(--bg-card-secondary-hover); /* чуть светлее default */
 }
 
 .primary {
-  background: #527b35;
-  border-color: #878f7a;
-  color: #ffffff;
+  background: var(--accent);
+  border-color: var(--border-card);
+  color: var(--text-on-accent);
 }
 
 .primary:hover {
-  background: #5d8a41; /* чуть светлее primary */
+  background: var(--accent-hover); /* чуть светлее primary */
 }
 
 .topEdge {
@@ -37,7 +37,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: #ffffff;
+  background: var(--edge-top);
 }
 
 .bottomEdge {
@@ -46,15 +46,15 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: #a7af99;
+  background: var(--edge-bottom);
 }
 
 .primary .topEdge {
-  background: #7b9e57;
+  background: var(--accent-edge-top);
 }
 
 .primary .bottomEdge {
-  background: #355321;
+  background: var(--accent-edge-bottom);
 }
 
 .content {

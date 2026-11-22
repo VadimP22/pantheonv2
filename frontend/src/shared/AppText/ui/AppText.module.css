@@ -1,5 +1,5 @@
 .root {
   margin: 0; /* отступы управляются снаружи (см. AppCard.content) */
   font-size: 10pt; /* ≈13.33px */
-  color: #666d5e;
+  color: var(--text-secondary);
 }

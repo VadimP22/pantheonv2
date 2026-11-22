@@ -1,14 +1,106 @@
 :root {
-  --bg: #fff;
-  --text: #6b6375;
-  --border: #e5e4e7;
-  --accent: #aa3bff;
-  color-scheme: light dark;
+  color-scheme: light;
   color: var(--text);
   background: var(--bg);
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Поверхности */
+  --bg: #e7e7dd;
+  --bg-header: #f5f4ec;
+  --bg-header-border: #cdcec1;
+  --bg-sidebar: #242820;
+  --bg-card: #f6f5ed;
+  --bg-card-secondary: #e0e2d4;
+  --bg-card-secondary-hover: #e7e9dc;
+  --bg-input: #fbfaf3;
+
+  /* Слоты инвентаря */
+  --bg-slot: #8e9781;
+  --bg-slot-selected: #a5bd88;
+  --bg-slot-edge-top: #67725b;
+  --bg-slot-edge-bottom: #e6e9de;
+
+  /* Рамки */
+  --border: #929986;
+  --border-card: #878f7a;
+
+  /* Текст */
+  --text: #293123;
+  --text-secondary: #666d5e;
+  --text-placeholder: #a7af99;
+  --text-on-dark: #cdd4c3;
+  --text-on-accent: #ffffff;
+  --error: #a33;
+
+  /* Minecraft-фаски (псевдо-3D кромки) */
+  --edge-top: #ffffff;
+  --edge-bottom: #a7af99;
+  --edge-bottom-card: #a4aa96;
+
+  /* Акцент */
+  --accent: #527b35;
+  --accent-hover: #5d8a41;
+  --accent-strong: #85b64e;
+  --accent-soft: #b9e279;
+  --accent-edge-top: #7b9e57;
+  --accent-edge-bottom: #355321;
+  --accent-track: #313d29;
+  --accent-nav-selected: #567c36;
+  --accent-nav-selected-hover: #628c3f;
+  --accent-nav-stripe: #c5ed8d;
+  --hover-nav: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Поверхности (базовый фон — тёмно-сиреневый) */
+  --bg: #140b28;
+  --bg-header: #1d1133;
+  --bg-header-border: #2c1c4a;
+  --bg-sidebar: #0e071c;
+  --bg-card: #1a102f;
+  --bg-card-secondary: #150c27;
+  --bg-card-secondary-hover: #201538;
+  --bg-input: #140b26;
+
+  /* Слоты инвентаря */
+  --bg-slot: #0f0a1f;
+  --bg-slot-selected: #1d2e63;
+  --bg-slot-edge-top: #120c24;
+  --bg-slot-edge-bottom: #33265c;
+
+  /* Рамки */
+  --border: #2f2154;
+  --border-card: #3a2a5f;
+
+  /* Текст */
+  --text: #e8e2f5;
+  --text-secondary: #a99fc4;
+  --text-placeholder: #6f648f;
+  --text-on-dark: #d6cfe6;
+  --text-on-accent: #ffffff;
+  --error: #ff8a8a;
+
+  /* Minecraft-фаски */
+  --edge-top: #2f2154;
+  --edge-bottom: #0d0719;
+  --edge-bottom-card: #2c1c4a;
+
+  /* Акцент (приглушённый синий вместо насыщенного) */
+  --accent: #4470bd;
+  --accent-hover: #5380ca;
+  --accent-strong: #5a86d8;
+  --accent-soft: #8fb6ea;
+  --accent-edge-top: #5380ca;
+  --accent-edge-bottom: #1e3366;
+  --accent-track: #1c2440;
+  --accent-nav-selected: #27417c;
+  --accent-nav-selected-hover: #335090;
+  --accent-nav-stripe: #7ba6e0;
+  --hover-nav: rgba(255, 255, 255, 0.1);
 }
 
 *,
@@ -20,13 +112,4 @@
 html,
 body {
   margin: 0;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --bg: #16171d;
-    --border: #2e303a;
-    --accent: #c084fc;
-  }
 }

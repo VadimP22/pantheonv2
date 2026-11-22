@@ -45,7 +45,7 @@
 
 .detailQty {
   margin-top: 30px; /* id → количество 30px */
-  color: #527b35; /* цвет количества */
+  color: var(--accent); /* цвет количества */
 }
 
 .detailStacks {
@@ -82,5 +82,5 @@
   margin: 0;
   text-align: center;
   font-size: 14px;
-  color: #527b35;
+  color: var(--accent);
 }

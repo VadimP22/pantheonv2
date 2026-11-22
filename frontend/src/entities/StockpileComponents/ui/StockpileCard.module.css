@@ -37,6 +37,6 @@
 .coordinates {
   margin-top: 6px;
   font-size: 12pt;
-  color: #527B35;
+  color: var(--accent);
   letter-spacing: 0.08em;
 }

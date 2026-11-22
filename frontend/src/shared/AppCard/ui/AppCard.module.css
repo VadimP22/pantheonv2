@@ -1,17 +1,17 @@
 .root {
   position: relative;
-  background: #f6f5ed;
-  border: 1px solid #878f7a;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
 }
 
 .secondary {
-  background: #e0e2d4;
-  border-color: #929986;
-  color: #293123;
+  background: var(--bg-card-secondary);
+  border-color: var(--border);
+  color: var(--text);
 }
 
 .secondary .bottomEdge {
-  background: #a7af99;
+  background: var(--edge-bottom);
 }
 
 .topEdge {
@@ -20,7 +20,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: #ffffff;
+  background: var(--edge-top);
 }
 
 .bottomEdge {
@@ -29,7 +29,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: #a4aa96;
+  background: var(--edge-bottom-card);
 }
 
 .content {

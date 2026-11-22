@@ -4,13 +4,13 @@
   align-items: center;
   width: 100%;
   height: 40px; /* высота как у AppButton */
-  background: #fbfaf3;
-  border: 1px solid #929986;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
   box-sizing: border-box;
 }
 
 .root:focus-within {
-  border-color: #527b35; /* подсветка зелёным, как фон primary-кнопки AppButton */
+  border-color: var(--accent); /* подсветка акцентом, как фон primary-кнопки AppButton */
 }
 
 .input {
@@ -21,7 +21,7 @@
   background: transparent;
   border: none;
   outline: none;
-  color: #293123;
+  color: var(--text);
   font: inherit;
   font-size: 14pt;
   line-height: 1;
@@ -29,7 +29,7 @@
 }
 
 .input::placeholder {
-  color: #a7af99; /* как у нижней полосы */
+  color: var(--text-placeholder); /* как у lower-кромки */
 }
 
 .topEdge {
@@ -38,7 +38,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: #ffffff;
+  background: var(--edge-top);
   pointer-events: none;
 }
 
@@ -48,6 +48,6 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: #a7af99;
+  background: var(--edge-bottom);
   pointer-events: none;
 }

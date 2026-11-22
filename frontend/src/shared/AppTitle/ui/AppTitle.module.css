@@ -2,5 +2,5 @@
   margin: 0; /* отступы управляются снаружи */
   font-size: 36pt; /* 48px */
   font-weight: 700; /* bold — числовая запись как в sidebarButton.module.css */
-  color: #293123;
+  color: var(--text);
 }
