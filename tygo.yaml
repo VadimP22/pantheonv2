@@ -1,0 +1,3 @@
+packages:
+  - path: "backend/dto"
+    output_path: "../frontend/src/shared/generated/dto.ts"

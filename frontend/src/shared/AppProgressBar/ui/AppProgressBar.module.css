@@ -1,0 +1,25 @@
+.root {
+  width: 100%;
+}
+
+.track {
+  position: relative;
+  height: 10px;
+  background: #313d29;
+}
+
+.fill {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  background: #85b64e;
+}
+
+.glint {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  height: 2px;
+  background: #b9e279;
+}

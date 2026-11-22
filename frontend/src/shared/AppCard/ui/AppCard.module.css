@@ -1,0 +1,37 @@
+.root {
+  position: relative;
+  background: #f6f5ed;
+  border: 1px solid #878f7a;
+}
+
+.secondary {
+  background: #e0e2d4;
+  border-color: #929986;
+  color: #293123;
+}
+
+.secondary .bottomEdge {
+  background: #a7af99;
+}
+
+.topEdge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #ffffff;
+}
+
+.bottomEdge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #a4aa96;
+}
+
+.content {
+  padding: 24px;
+}

@@ -1,0 +1,10 @@
+.codesearch.db
+.serena
+.dsh-acl-report
+.dsh-bundles
+.serena
+.npm-cache
+.pnpm-store
+
+# tygo — сгенерированные типы из Go-DTO
+frontend/src/shared/generated/

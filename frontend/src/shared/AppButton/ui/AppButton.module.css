@@ -1,0 +1,63 @@
+.root {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 40px;
+  background: #e0e2d4;
+  border: 1px solid #929986;
+  box-sizing: border-box;
+  color: #293123;
+  font-size: 14pt;
+  line-height: 1;
+  cursor: pointer;
+  appearance: none;
+  outline: none;
+  transition: background-color 100ms ease;
+}
+
+.root:hover {
+  background: #e7e9dc; /* чуть светлее default */
+}
+
+.primary {
+  background: #527b35;
+  border-color: #878f7a;
+  color: #ffffff;
+}
+
+.primary:hover {
+  background: #5d8a41; /* чуть светлее primary */
+}
+
+.topEdge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #ffffff;
+}
+
+.bottomEdge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #a7af99;
+}
+
+.primary .topEdge {
+  background: #7b9e57;
+}
+
+.primary .bottomEdge {
+  background: #355321;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+}

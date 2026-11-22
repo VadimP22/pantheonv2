@@ -1,0 +1,86 @@
+.wrapper {
+  display: flex;
+  align-items: stretch;
+  gap: 24px;
+  width: fit-content;
+  margin-top: 32px;
+}
+
+.detail {
+  width: 288px; /* карточка остаётся фиксированной ширины */
+  /* display:flex убрали: иначе внутренний .content не растягивается
+     по ширине, а сжимается под контент, и отступы справа теряются */
+}
+
+.detailColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 320px;
+}
+
+.detailIcon {
+  margin-top: 20px; /* иконка: отступ 20px сверху */
+}
+
+.detailTitle {
+  margin-top: 10px; /* icon → title 10px */
+  font-size: 24pt; /* название предмета */
+  white-space: nowrap; /* одна строка, без переносов */
+  overflow: hidden; /* обрезка выходящего за блок текста */
+  max-width: 100%; /* не вылезать за границы карточки */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 78%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(to right, #000 0%, #000 78%, transparent 100%);
+}
+
+.detailId {
+  margin-top: 10px; /* title → id 10px */
+}
+
+.detailQty {
+  margin-top: 30px; /* id → количество 30px */
+  color: #527b35; /* цвет количества */
+}
+
+.detailStacks {
+  margin-top: 2px; /* количество → «стаки» 2px */
+}
+
+.detailActions {
+  margin-top: auto; /* кнопка прижимается к низу панели */
+  width: 100%; /* обёртка на всю ширину */
+  padding-top: 30px; /* отступ перед кнопкой */
+}
+
+.detailActions button {
+  width: 100%; /* растянуть AppButton на всю ширину */
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(9, 72px);
+  grid-template-rows: repeat(3, 76px);
+  gap: 8px 6px;
+}
+
+.paginator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.pageIndicator {
+  min-width: 48px;
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: #527b35;
+}

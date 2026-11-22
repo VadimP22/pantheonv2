@@ -1,0 +1,42 @@
+.root {
+  width: 360px;
+  height: 280px;
+  box-sizing: border-box;
+}
+
+.action {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.dimension {
+  font-size: 12pt;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin-top: 18px;
+  font-size: 23px;
+  line-height: 1.2;
+}
+
+.coordinates {
+  margin-top: 6px;
+  font-size: 12pt;
+  color: #527B35;
+  letter-spacing: 0.08em;
+}

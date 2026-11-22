@@ -1,0 +1,33 @@
+.root {
+  display: flex;
+  width: 100%;
+  min-height: 100svh;
+  background: #e7e7dd;
+}
+
+.sidebar {
+  flex-shrink: 0;
+  width: 240px;
+  background: #242820;
+}
+
+.mainPane {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.header {
+  flex-shrink: 0;
+  height: 76px;
+  background: #f5f4ec;
+  border-bottom: 2px solid #cdcec1;
+  box-sizing: border-box;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+}

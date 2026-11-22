@@ -1,0 +1,25 @@
+/* Внешних отступов нет — их задаёт AppLayout.content.
+   Внутренние интервалы: breadcrumbs → 10px → title → 2px → description. */
+
+.titleRow {
+  display: flex;
+  align-items: center; /* слот выровнен по центру строки заголовка */
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 10px; /* breadcrumbs → title */
+}
+
+.heading {
+  margin-top: 0; /* отступ задаёт .titleRow */
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.subtitle {
+  margin-top: 2px; /* title → description */
+}

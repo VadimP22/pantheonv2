@@ -1,0 +1,62 @@
+.root {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  background: transparent;
+  padding: 10px 12px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 400;
+  color: #cdd4c3;
+  text-align: left;
+  border: none;
+  outline: none;
+  appearance: none;
+  transition:
+    background-color 100ms ease,
+    color 100ms ease;
+}
+
+/* Полупрозрачный белый фон при наведении на обычное состояние. */
+.root:not(.selected):hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.content {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  z-index: 1;
+}
+
+.icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.selected {
+  background: #567c36;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Вертикальная полоска слева у активного пункта. */
+.selected::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  background: #c5ed8d;
+}
+
+.selected:hover {
+  background: #628c3f;
+}
