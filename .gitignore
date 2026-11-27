@@ -8,3 +8,6 @@
 
 # tygo — сгенерированные типы из Go-DTO
 frontend/src/shared/generated/
+
+backend/backend.exe
+backend/*.db

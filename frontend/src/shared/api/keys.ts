@@ -19,4 +19,11 @@ export const taskKeys = {
   all: ['tasks'] as const,
   list: (params: ListTasksParams) => ['tasks', 'list', params] as const,
   detail: (id: number) => ['tasks', 'detail', id] as const,
+  delete: (id: number) => ['tasks', 'delete', id] as const,
+}
+
+/** Ключи TanStack Query для запросов локализаций предметов. */
+export const itemLocalizationKeys = {
+  all: ['itemLocalizations'] as const,
+  detail: (lang: string, itemId: string) => ['itemLocalizations', 'detail', lang, itemId] as const,
 }

@@ -22,6 +22,7 @@ const (
 	colItemCount       = "item_count"
 	colTargetItemCount = "target_item_count"
 	colStockpileID     = "stockpile_id"
+	colDeleted         = "deleted"
 )
 
 // listColumns перечисляет все колонки, сканируемые при чтении записи.
@@ -37,6 +38,7 @@ var listColumns = []string{
 	colItemCount,
 	colTargetItemCount,
 	colStockpileID,
+	colDeleted,
 }
 
 // Repository обеспечивает операции чтения над таблицей tasks.
@@ -53,8 +55,8 @@ func New(db *sql.DB) *Repository {
 // Поле is_checkbox хранится как 0/1 (SQLite INTEGER); драйвер конвертирует bool.
 // stockpile_id может быть nil — в БД запишется NULL.
 func (r *Repository) Create(name, description, iconItemName string, isCheckbox bool, done bool, itemID string, itemCount, targetItemCount int64, stockpileID *int64) (int64, error) {
-	const query = `INSERT INTO tasks (name, description, icon_item_name, is_checkbox, done, item_id, item_count, target_item_count, stockpile_id)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`
+	const query = `INSERT INTO tasks (name, description, icon_item_name, is_checkbox, done, item_id, item_count, target_item_count, stockpile_id, deleted)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0) RETURNING id`
 
 	var id int64
 	if err := r.db.QueryRow(query, name, description, iconItemName, isCheckbox, done, itemID, itemCount, targetItemCount, stockpileID).Scan(&id); err != nil {
@@ -66,7 +68,7 @@ func (r *Repository) Create(name, description, iconItemName string, isCheckbox b
 // GetByID возвращает запись по идентификатору.
 // Если запись не найдена, возвращается sql.ErrNoRows — вызов решает, как обработать.
 func (r *Repository) GetByID(id int64) (*model.Task, error) {
-	query := buildSelect("WHERE " + colID + " = ?")
+	query := buildSelect("WHERE " + colDeleted + " = 0 AND " + colID + " = ?")
 
 	t, err := scanTask(r.db.QueryRow(query, id))
 	if err != nil {
@@ -79,7 +81,7 @@ func (r *Repository) GetByID(id int64) (*model.Task, error) {
 // List возвращает все записи, упорядоченные по id.
 // При пустой таблице возвращается пустой не-nil слайс.
 func (r *Repository) List() ([]model.Task, error) {
-	query := buildSelect("ORDER BY " + colID)
+	query := buildSelect("WHERE " + colDeleted + " = 0 ORDER BY " + colID)
 
 	rows, err := r.db.Query(query)
 	if err != nil {
@@ -104,7 +106,7 @@ func (r *Repository) List() ([]model.Task, error) {
 
 // Count возвращает общее количество записей в таблице tasks.
 func (r *Repository) Count() (int64, error) {
-	const query = `SELECT COUNT(*) FROM tasks`
+	const query = `SELECT COUNT(*) FROM tasks WHERE ` + colDeleted + ` = 0`
 
 	var n int64
 	if err := r.db.QueryRow(query).Scan(&n); err != nil {
@@ -113,10 +115,24 @@ func (r *Repository) Count() (int64, error) {
 	return n, nil
 }
 
+// Delete помечает запись удалённой (soft-delete: deleted = 1).
+// Возвращает false, если запись с таким id не найдена.
+func (r *Repository) Delete(id int64) (bool, error) {
+	res, err := r.db.Exec("UPDATE tasks SET "+colDeleted+" = 1 WHERE "+colID+" = ? AND "+colDeleted+" = 0", id)
+	if err != nil {
+		return false, fmt.Errorf("tasks: delete %d: %w", id, err)
+	}
+	n, err := res.RowsAffected()
+	if err != nil {
+		return false, fmt.Errorf("tasks: delete %d rows affected: %w", id, err)
+	}
+	return n > 0, nil
+}
+
 // AddItemCount прибавляет delta к item_count задачи id.
 // Возвращает false, если задача не найдена.
 func (r *Repository) AddItemCount(id int64, delta int64) (bool, error) {
-	res, err := r.db.Exec("UPDATE tasks SET "+colItemCount+" = "+colItemCount+" + ? WHERE "+colID+" = ?", delta, id)
+	res, err := r.db.Exec("UPDATE tasks SET "+colItemCount+" = "+colItemCount+" + ? WHERE "+colID+" = ? AND "+colDeleted+" = 0", delta, id)
 	if err != nil {
 		return false, fmt.Errorf("tasks: add item count: %w", err)
 	}
@@ -126,6 +142,8 @@ func (r *Repository) AddItemCount(id int64, delta int64) (bool, error) {
 	}
 	return n > 0, nil
 }
+
+// ErrNoUpdateFields возвращается, когда в input нет ни одного не-nil поля,
 
 // ErrNoUpdateFields возвращается, когда в input нет ни одного не-nil поля,
 // поэтому обновлять нечего.
@@ -180,7 +198,7 @@ func (r *Repository) Update(id int64, in model.UpdateTaskInput) (bool, error) {
 		return false, ErrNoUpdateFields
 	}
 
-	query := "UPDATE tasks SET " + strings.Join(sets, ", ") + " WHERE id = ?"
+	query := "UPDATE tasks SET " + strings.Join(sets, ", ") + " WHERE id = ? AND " + colDeleted + " = 0"
 	args = append(args, id)
 
 	res, err := r.db.Exec(query, args...)
@@ -199,7 +217,7 @@ func (r *Repository) Update(id int64, in model.UpdateTaskInput) (bool, error) {
 // ListPaged возвращает страницу записей, упорядоченных по id, начиная с offset,
 // в количестве не более limit. При пустой странице возвращается пустой не-nil слайс.
 func (r *Repository) ListPaged(limit, offset int) ([]model.Task, error) {
-	query := buildSelect("ORDER BY " + colID + " LIMIT ? OFFSET ?")
+	query := buildSelect("WHERE " + colDeleted + " = 0 ORDER BY " + colID + " LIMIT ? OFFSET ?")
 
 	rows, err := r.db.Query(query, limit, offset)
 	if err != nil {
@@ -255,7 +273,7 @@ func scanTask(scanner interface{ Scan(dest ...any) error }) (model.Task, error) 
 	)
 	if err := scanner.Scan(
 		&t.ID, &t.Name, &t.Description, &t.IconItemName, &t.IsCheckbox, &t.Done,
-		&t.ItemID, &t.ItemCount, &t.TargetItemCount, &stockID,
+		&t.ItemID, &t.ItemCount, &t.TargetItemCount, &stockID, &t.Deleted,
 	); err != nil {
 		return model.Task{}, fmt.Errorf("scan task: %w", err)
 	}

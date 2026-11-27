@@ -199,16 +199,14 @@ func (s *Service) ensureStockpile(id int64) error {
 	}
 }
 
-// find ищет запись по паре «склад + ресурс». Возвращает nil, nil при отсутствии.
+// find ищет запись по паре «склад + предмет». Возвращает nil, nil при отсутствии.
 func (s *Service) find(stockpileID int64, itemID string) (*model.StockpileResource, error) {
-	items, err := s.resources.ListByStockpile(stockpileID)
+	rec, err := s.resources.GetByStockpileAndItem(stockpileID, itemID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
 		return nil, err
 	}
-	for i := range items {
-		if items[i].ItemID == itemID {
-			return &items[i], nil
-		}
-	}
-	return nil, nil
+	return rec, nil
 }

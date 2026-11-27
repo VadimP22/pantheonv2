@@ -19,6 +19,7 @@ import (
 	ctrlresources "backend/controller/stockpile_resources"
 	ctrlstockpiles "backend/controller/stockpiles"
 	ctrltasks "backend/controller/tasks"
+	"backend/lib/langseed"
 	repoloc "backend/repository/item_localizations"
 	reporesources "backend/repository/stockpile_resources"
 	repostockpiles "backend/repository/stockpiles"
@@ -83,6 +84,11 @@ func run() error {
 		return fmt.Errorf("get migrations version: %w", err)
 	}
 	log.Printf("migrations up to date (version=%d dirty=%v)", ver, dirty)
+
+	// Заполнение справочных таблиц из данных, встроенных в бинарник.
+	if err := langseed.Run(db); err != nil {
+		return fmt.Errorf("seed data: %w", err)
+	}
 
 	// HTTP-сервер: репозиторий -> сервис -> контроллер.
 	repo := repostockpiles.New(db)

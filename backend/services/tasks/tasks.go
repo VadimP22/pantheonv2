@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"strings"
 
-	"backend/dto"
 	model "backend/model/tasks"
 	repo "backend/repository/tasks"
 	svcresources "backend/services/stockpile_resources"
@@ -47,7 +46,7 @@ func New(r *repo.Repository, resources *svcresources.Service) *Service {
 //     item_id и количества не требуются.
 //
 // stockpile_id опционален в обоих случаях (nil — целевой склад не задан).
-func (s *Service) Create(in dto.CreateTaskInputDTO) (int64, error) {
+func (s *Service) Create(in model.CreateTaskInput) (int64, error) {
 	if strings.TrimSpace(in.Name) == "" {
 		return 0, fmt.Errorf("%w: name is required", ErrInvalidInput)
 	}
@@ -95,6 +94,19 @@ func (s *Service) ListPaged(limit, offset int) ([]model.Task, error) {
 // Count возвращает общее количество задач.
 func (s *Service) Count() (int64, error) {
 	return s.repo.Count()
+}
+
+// Delete помечает задачу удалённой (soft-delete).
+// Возвращает ErrNotFound, если задача с таким id не существует.
+func (s *Service) Delete(id int64) error {
+	ok, err := s.repo.Delete(id)
+	if err != nil {
+		return fmt.Errorf("tasks: delete %d: %w", id, err)
+	}
+	if !ok {
+		return ErrNotFound
+	}
+	return nil
 }
 
 // Deposit пополняет запас задачи: upsert в stockpile_resources и рост item_count.

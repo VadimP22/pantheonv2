@@ -4,6 +4,7 @@ import TaskCard from '../../../entities/TaskComponents/ui/TaskCard.tsx'
 import AppPaginator from '../../../shared/AppPaginator/ui/AppPaginator.tsx'
 import AppText from '../../../shared/AppText/ui/AppText.tsx'
 import { useTasks } from '../hooks/useTasks.ts'
+import { useDeleteTask } from '../hooks/useDeleteTask.ts'
 import styles from './TasksList.module.css'
 
 /** Количество карточек на странице: сетка 3×2. */
@@ -21,6 +22,7 @@ export interface TasksListProps {
 export function TasksList({ className }: TasksListProps) {
   const [page, setPage] = useState(1)
   const navigate = useNavigate()
+  const deleteTaskMutation = useDeleteTask()
   const { data, isPending, isError, error } = useTasks({ page, pageSize: PAGE_SIZE })
   const rootClassName = className ? `${styles.root} ${className}` : styles.root
 
@@ -54,6 +56,11 @@ export function TasksList({ className }: TasksListProps) {
             onDepositClick={
               !task.is_checkbox && task.stockpile_id != null
                 ? () => navigate('/tasks/' + task.id + '/deposit')
+                : undefined
+            }
+            onCompleteClick={
+              !task.is_checkbox && task.stockpile_id != null && task.item_count >= task.target_item_count
+                ? () => deleteTaskMutation.mutate(task.id)
                 : undefined
             }
           />

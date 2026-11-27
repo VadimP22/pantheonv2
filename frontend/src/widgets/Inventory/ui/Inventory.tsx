@@ -6,6 +6,7 @@ import AppButton from '../../../shared/AppButton/ui/AppButton.tsx'
 import AppMinecraftIcon from '../../../shared/AppMinecraftIcon/ui/AppMinecraftIcon.tsx'
 import InventorySlotWithItem from '../../../entities/InventoryComponents/ui/InventorySlotWithItem.tsx'
 import { useStockpileResources } from '../../../features/Stockpile/hooks/useStockpileResources.ts'
+import { useItemLocalization } from '../../../features/localization/hooks/useItemLocalization.ts'
 import styles from './Inventory.module.css'
 
 /** Размер одного стака в штуках (стандарт Minecraft). */
@@ -46,6 +47,10 @@ export function Inventory({ stockpileId, pageSize = 27, className, onDeposit }: 
   const start = (currentPage - 1) * pageSize
   const pageItems = items.slice(start, start + pageSize)
   const selectedItem = items.find((item) => item.itemId === selectedItemId) ?? null
+  const { data: localization, isPending: isLocPending } = useItemLocalization(selectedItemId)
+  const selectedItemName = isLocPending
+    ? 'загрузка...'
+    : (localization?.item_name ?? selectedItem?.itemId ?? '')
   const selectedItemStacks = selectedItem
     ? Math.floor(selectedItem.count / STACK_SIZE)
     : 0
@@ -101,7 +106,7 @@ export function Inventory({ stockpileId, pageSize = 27, className, onDeposit }: 
               <AppMinecraftIcon name={selectedItem.itemId} size={48} />
             </div>
 
-            <AppTitle className={styles.detailTitle}>{selectedItem.itemId}</AppTitle>
+            <AppTitle className={styles.detailTitle}>{selectedItemName}</AppTitle>
             <AppText className={styles.detailId}>{selectedItem.itemId}</AppText>
 
             <AppTitle className={styles.detailQty}>{selectedItem.count}</AppTitle>

@@ -28,3 +28,11 @@
   opacity: 0.5;
   color: var(--text-placeholder);
 }
+
+.danger {
+  color: var(--danger);
+}
+
+.danger:hover {
+  filter: brightness(1.05);
+}

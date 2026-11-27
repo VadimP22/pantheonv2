@@ -34,6 +34,7 @@
   --text-on-dark: #cdd4c3;
   --text-on-accent: #ffffff;
   --error: #a33;
+  --danger: #c62828;
 
   /* Minecraft-фаски (псевдо-3D кромки) */
   --edge-top: #ffffff;
@@ -90,6 +91,7 @@
   --text-on-dark: #d6cfe6;
   --text-on-accent: #ffffff;
   --error: #ff8a8a;
+  --danger: #ef9a9a;
 
   /* Minecraft-фаски */
   --edge-top: #2f2154;

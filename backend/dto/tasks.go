@@ -11,6 +11,7 @@ type TaskDTO struct {
 	IconItemName    string `json:"icon_item_name"`
 	IsCheckbox      bool   `json:"is_checkbox"`
 	Done            bool   `json:"done"`
+	Deleted         bool   `json:"deleted"`
 	ItemID          string `json:"item_id"`
 	ItemCount       int64  `json:"item_count"`
 	TargetItemCount int64  `json:"target_item_count"`
@@ -64,3 +65,6 @@ type CreateTaskInputDTO struct {
 type DepositTaskInputDTO struct {
 	Count int64 `json:"count"`
 }
+
+// DeleteTaskInputDTO — входные данные для удаления задачи (пустой).
+type DeleteTaskInputDTO struct{}

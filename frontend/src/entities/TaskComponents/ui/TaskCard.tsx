@@ -25,6 +25,8 @@ export interface TaskCardProps {
   className?: string
   /** Обработчик нажатия на кнопку «Внести»; undefined — кнопка не рендерится */
   onDepositClick?: () => void
+  /** Обработчик нажатия на кнопку «Завершить»; undefined — кнопка не рендерится */
+  onCompleteClick?: () => void
 }
 
 /**
@@ -41,6 +43,7 @@ export function TaskCard({
   done,
   className,
   onDepositClick,
+  onCompleteClick,
 }: TaskCardProps) {
   const rootClassName = className ? `${styles.root} ${className}` : styles.root
   const progress = targetItemCount && targetItemCount > 0
@@ -53,11 +56,18 @@ export function TaskCard({
         <div className={styles.icon}>
           <AppMinecraftIcon name={iconItemName} size={40} title={name} />
         </div>
-        {onDepositClick && (
+        {onDepositClick || onCompleteClick ? (
           <div className={styles.deposit}>
-            <AppTextButton onClick={onDepositClick}>{'Внести'}</AppTextButton>
+            {onCompleteClick && (
+              <AppTextButton variant="danger" onClick={onCompleteClick}>
+                {'Завершить'}
+              </AppTextButton>
+            )}
+            {onDepositClick && (
+              <AppTextButton onClick={onDepositClick}>{'Внести'}</AppTextButton>
+            )}
           </div>
-        )}
+        ) : null}
       </div>
       <AppTitle level={2} className={styles.title}>
         {name}

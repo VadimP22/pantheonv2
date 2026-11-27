@@ -21,6 +21,7 @@ const (
 	tasksGetPattern     = "GET /api/tasks/{id}"
 	tasksUpdatePattern  = "PUT /api/tasks/{id}"
 	tasksDepositPattern = "POST /api/tasks/{id}/deposit"
+	tasksDeletePattern  = "DELETE /api/tasks/{id}"
 )
 
 // Controller обрабатывает HTTP-запросы к ресурсу tasks.
@@ -40,6 +41,7 @@ func (c *Controller) Register(mux *http.ServeMux) {
 	mux.HandleFunc(tasksGetPattern, c.handleGetByID)
 	mux.HandleFunc(tasksUpdatePattern, c.handleUpdate)
 	mux.HandleFunc(tasksDepositPattern, c.handleDeposit)
+	mux.HandleFunc(tasksDeletePattern, c.handleDelete)
 }
 
 // handleCreate обрабатывает POST /api/tasks — создание записи.
@@ -50,7 +52,7 @@ func (c *Controller) handleCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := c.svc.Create(in)
+	id, err := c.svc.Create(toCreateModel(in))
 	if err != nil {
 		writeServiceError(w, err)
 		return
@@ -124,6 +126,7 @@ func toDTO(m model.Task) dto.TaskDTO {
 		IconItemName:    m.IconItemName,
 		IsCheckbox:      m.IsCheckbox,
 		Done:            m.Done,
+		Deleted:         m.Deleted,
 		ItemID:          m.ItemID,
 		ItemCount:       m.ItemCount,
 		TargetItemCount: m.TargetItemCount,
@@ -138,6 +141,21 @@ func toDTOList(items []model.Task) []dto.TaskDTO {
 		out[i] = toDTO(m)
 	}
 	return out
+}
+
+// toCreateModel конвертирует DTO создания задачи в модель создания.
+// Единственная точка, где dto встречается с model; сервис dto не знает.
+func toCreateModel(in dto.CreateTaskInputDTO) model.CreateTaskInput {
+	return model.CreateTaskInput{
+		Name:            in.Name,
+		Description:     in.Description,
+		IconItemName:    in.IconItemName,
+		IsCheckbox:      in.IsCheckbox,
+		ItemID:          in.ItemID,
+		ItemCount:       in.ItemCount,
+		TargetItemCount: in.TargetItemCount,
+		StockpileID:     in.StockpileID,
+	}
 }
 
 // toUpdateModel конвертирует DTO обновления в модель обновления.
@@ -197,6 +215,21 @@ func (c *Controller) handleDeposit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	lib.WriteJSON(w, http.StatusOK, toDTO(m))
+}
+
+// handleDelete обрабатывает DELETE /api/tasks/{id} — мягкое удаление задачи.
+func (c *Controller) handleDelete(w http.ResponseWriter, r *http.Request) {
+	id, err := lib.ParseID(r)
+	if err != nil {
+		lib.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := c.svc.Delete(id); err != nil {
+		writeServiceError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // writeServiceError сопоставляет ошибки сервиса с HTTP-статусами.

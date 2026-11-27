@@ -70,6 +70,20 @@ func (r *Repository) GetByID(id int64) (*model.StockpileResource, error) {
 	return &rec, nil
 }
 
+// GetByStockpileAndItem возвращает ресурс по паре (stockpile_id, item_id).
+// Если пара не найдена, возвращается sql.ErrNoRows — вызов решает, как обработать.
+func (r *Repository) GetByStockpileAndItem(stockpileID int64, itemID string) (*model.StockpileResource, error) {
+	query := buildSelect("WHERE " + colStockpileID + " = ? AND " + colItemID + " = ?")
+
+	var rec model.StockpileResource
+	err := r.db.QueryRow(query, stockpileID, itemID).Scan(&rec.ID, &rec.StockpileID, &rec.ItemID, &rec.ItemCount)
+	if err != nil {
+		return nil, fmt.Errorf("get stockpile resource stockpile=%d item=%q: %w", stockpileID, itemID, err)
+	}
+
+	return &rec, nil
+}
+
 // ListByStockpile возвращает все ресурсы указанного склада, упорядоченные по id.
 // При отсутствии записей возвращается пустой не-nil слайс.
 func (r *Repository) ListByStockpile(stockpileID int64) ([]model.StockpileResource, error) {
