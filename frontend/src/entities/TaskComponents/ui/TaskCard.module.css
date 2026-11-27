@@ -1,0 +1,68 @@
+.root {
+  width: 360px;
+  height: 280px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.deposit {
+  display: flex;
+}
+
+.icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.title {
+  margin-top: 18px;
+  font-size: 23px;
+  line-height: 1.2;
+}
+
+.description {
+  margin-top: 6px;
+  font-size: 12pt;
+  color: var(--text-secondary);
+}
+
+.bottom {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusDone {
+  font-size: 12pt;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.statusPending {
+  font-size: 12pt;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.progressCaption {
+  font-size: 12pt;
+  color: var(--text-secondary);
+}

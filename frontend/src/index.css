@@ -25,6 +25,7 @@
   /* Рамки */
   --border: #929986;
   --border-card: #878f7a;
+  --border-divider: #cdd2c1;
 
   /* Текст */
   --text: #293123;
@@ -51,6 +52,11 @@
   --accent-nav-selected-hover: #628c3f;
   --accent-nav-stripe: #c5ed8d;
   --hover-nav: rgba(255, 255, 255, 0.15);
+
+  /* Переполнение прогресс-бара (value > 100): золото */
+  --progress-overflow-fill: #d4a32d;
+  --progress-overflow-glint: #f6db7d;
+  --progress-overflow-track: #453a16;
 }
 
 [data-theme='dark'] {
@@ -75,6 +81,7 @@
   /* Рамки */
   --border: #2f2154;
   --border-card: #3a2a5f;
+  --border-divider: #3a2a5f;
 
   /* Текст */
   --text: #e8e2f5;
@@ -101,6 +108,11 @@
   --accent-nav-selected-hover: #335090;
   --accent-nav-stripe: #7ba6e0;
   --hover-nav: rgba(255, 255, 255, 0.1);
+
+  /* Переполнение прогресс-бара (value > 100): фиолетовый */
+  --progress-overflow-fill: #a77bc4;
+  --progress-overflow-glint: #d3b6ef;
+  --progress-overflow-track: #3b2657;
 }
 
 *,

@@ -4,19 +4,17 @@
 package stockpile_resources
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"backend/dto"
+	"backend/lib"
 	model "backend/model/stockpile_resources"
 	svc "backend/services/stockpile_resources"
 )
 
 // Паттерны маршрутов контроллера со служебным префиксом /api.
-// Именование: controllername + Handlername + Pattern.
 const (
 	resourcesListPattern     = "GET /api/stockpiles/{id}/resources"
 	resourcesDepositPattern  = "POST /api/stockpiles/{id}/resources/deposit"
@@ -43,9 +41,9 @@ func (c *Controller) Register(mux *http.ServeMux) {
 // handleList обрабатывает GET /api/stockpiles/{id}/resources — ресурсы склада,
 // отсортированные по убыванию количества.
 func (c *Controller) handleList(w http.ResponseWriter, r *http.Request) {
-	id, err := parseID(r)
+	id, err := lib.ParseID(r)
 	if err != nil {
-		writeError(w, http.StatusBadRequest, err)
+		lib.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
@@ -55,21 +53,21 @@ func (c *Controller) handleList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, toDTOList(items))
+	lib.WriteJSON(w, http.StatusOK, toDTOList(items))
 }
 
 // handleDeposit обрабатывает POST /api/stockpiles/{id}/resources/deposit —
 // пополнение ресурса. Возвращает актуальное состояние записи.
 func (c *Controller) handleDeposit(w http.ResponseWriter, r *http.Request) {
-	id, err := parseID(r)
+	id, err := lib.ParseID(r)
 	if err != nil {
-		writeError(w, http.StatusBadRequest, err)
+		lib.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
 	var in dto.ChangeStockpileResourceInputDTO
-	if err := decodeJSON(r, &in); err != nil {
-		writeError(w, http.StatusBadRequest, err)
+	if err := lib.DecodeJSON(r, &in); err != nil {
+		lib.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
@@ -78,22 +76,22 @@ func (c *Controller) handleDeposit(w http.ResponseWriter, r *http.Request) {
 		writeServiceError(w, err)
 		return
 	}
-	writeJSON(w, http.StatusOK, toDTO(m))
+	lib.WriteJSON(w, http.StatusOK, toDTO(m))
 }
 
 // handleWithdraw обрабатывает POST /api/stockpiles/{id}/resources/withdraw —
 // списание ресурса. При нехватке ресурса сервис возвращает ErrInsufficient,
 // который маппится в 409 Conflict.
 func (c *Controller) handleWithdraw(w http.ResponseWriter, r *http.Request) {
-	id, err := parseID(r)
+	id, err := lib.ParseID(r)
 	if err != nil {
-		writeError(w, http.StatusBadRequest, err)
+		lib.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
 	var in dto.ChangeStockpileResourceInputDTO
-	if err := decodeJSON(r, &in); err != nil {
-		writeError(w, http.StatusBadRequest, err)
+	if err := lib.DecodeJSON(r, &in); err != nil {
+		lib.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
@@ -125,49 +123,16 @@ func toDTO(m model.StockpileResource) dto.StockpileResourceDTO {
 	}
 }
 
-// parseID извлекает и валидирует id из path-переменной {id}.
-func parseID(r *http.Request) (int64, error) {
-	s := r.PathValue("id")
-	id, err := strconv.ParseInt(s, 10, 64)
-	if err != nil || id < 1 {
-		return 0, fmt.Errorf("invalid id: %q", s)
-	}
-	return id, nil
-}
-
-// decodeJSON декодирует тело запроса; пустое тело считается ошибкой (EOF).
-func decodeJSON(r *http.Request, v any) error {
-	if err := json.NewDecoder(r.Body).Decode(v); err != nil {
-		return fmt.Errorf("invalid json body: %w", err)
-	}
-	return nil
-}
-
-// writeJSON записывает тело в формате JSON с заданным статусом.
-// Если кодирование не удалось (тело уже частично записано), статус не меняем.
-func writeJSON(w http.ResponseWriter, status int, v any) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(v)
-}
-
-// writeError записывает сообщение об ошибке в виде {"error":"..."}.
-func writeError(w http.ResponseWriter, status int, err error) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
-}
-
 // writeServiceError сопоставляет ошибки сервиса с HTTP-статусами.
 func writeServiceError(w http.ResponseWriter, err error) {
 	switch {
 	case errors.Is(err, svc.ErrNotFound):
-		writeError(w, http.StatusNotFound, err)
+		lib.WriteError(w, http.StatusNotFound, err)
 	case errors.Is(err, svc.ErrInsufficient):
-		writeError(w, http.StatusConflict, err)
+		lib.WriteError(w, http.StatusConflict, err)
 	case errors.Is(err, svc.ErrInvalidInput):
-		writeError(w, http.StatusBadRequest, err)
+		lib.WriteError(w, http.StatusBadRequest, err)
 	default:
-		writeError(w, http.StatusInternalServerError, err)
+		lib.WriteError(w, http.StatusInternalServerError, fmt.Errorf("stockpile resources: %w", err))
 	}
 }

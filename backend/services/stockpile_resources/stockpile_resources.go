@@ -67,6 +67,9 @@ func (s *Service) Deposit(stockpileID int64, itemID string, count int64) (model.
 		if err := s.resources.Create(&created); err != nil {
 			return model.StockpileResource{}, fmt.Errorf("deposit resource: %w", err)
 		}
+		if err := s.stockpiles.Touch(stockpileID); err != nil {
+			return model.StockpileResource{}, fmt.Errorf("deposit resource: %w", err)
+		}
 		return created, nil
 	}
 
@@ -77,6 +80,10 @@ func (s *Service) Deposit(stockpileID int64, itemID string, count int64) (model.
 		return model.StockpileResource{}, fmt.Errorf("deposit resource: %w", err)
 	case !updated:
 		return model.StockpileResource{}, fmt.Errorf("%w: resource %d disappeared", ErrNotFound, rec.ID)
+	}
+
+	if err := s.stockpiles.Touch(stockpileID); err != nil {
+		return model.StockpileResource{}, fmt.Errorf("deposit resource: %w", err)
 	}
 
 	rec.ItemCount = total
@@ -111,6 +118,9 @@ func (s *Service) Withdraw(stockpileID int64, itemID string, count int64) error 
 		if err := s.resources.Delete(rec.ID); err != nil {
 			return fmt.Errorf("withdraw resource: %w", err)
 		}
+		if err := s.stockpiles.Touch(stockpileID); err != nil {
+			return fmt.Errorf("withdraw resource: %w", err)
+		}
 		return nil
 	}
 
@@ -120,6 +130,10 @@ func (s *Service) Withdraw(stockpileID int64, itemID string, count int64) error 
 		return fmt.Errorf("withdraw resource: %w", err)
 	case !updated:
 		return fmt.Errorf("%w: resource %d disappeared", ErrNotFound, rec.ID)
+	}
+
+	if err := s.stockpiles.Touch(stockpileID); err != nil {
+		return fmt.Errorf("withdraw resource: %w", err)
 	}
 	return nil
 }

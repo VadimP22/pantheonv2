@@ -1,0 +1,30 @@
+.root {
+  padding: 0;
+  border: none;
+  background: transparent;
+
+  /* Типографика: жирный текст 12pt цвета акцента */
+  font: inherit;
+  font-size: 12pt;
+  font-weight: bold;
+  color: var(--accent);
+
+  /* Поведение как у кнопки */
+  display: inline;
+  cursor: pointer;
+  appearance: none;
+  outline: none;
+  line-height: inherit;
+  transition: color 100ms ease, filter 100ms ease;
+}
+
+.root:hover {
+  filter: brightness(1.05); /* лёгкое светлее акцента при наведении */
+}
+
+.root:disabled {
+  cursor: default;
+  filter: none;
+  opacity: 0.5;
+  color: var(--text-placeholder);
+}

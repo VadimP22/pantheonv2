@@ -15,12 +15,18 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "modernc.org/sqlite"
 
+	ctrlloc "backend/controller/item_localizations"
 	ctrlresources "backend/controller/stockpile_resources"
 	ctrlstockpiles "backend/controller/stockpiles"
+	ctrltasks "backend/controller/tasks"
+	repoloc "backend/repository/item_localizations"
 	reporesources "backend/repository/stockpile_resources"
 	repostockpiles "backend/repository/stockpiles"
+	repostasks "backend/repository/tasks"
+	svcloc "backend/services/item_localizations"
 	svcresources "backend/services/stockpile_resources"
 	svcstockpiles "backend/services/stockpiles"
+	svctasks "backend/services/tasks"
 )
 
 func main() {
@@ -87,9 +93,19 @@ func run() error {
 	svcResources := svcresources.New(repoResources, repo)
 	ctrlResources := ctrlresources.New(svcResources)
 
+	repoLoc := repoloc.New(db)
+	svcLoc := svcloc.New(repoLoc)
+	ctrlLoc := ctrlloc.New(svcLoc)
+
+	repoTasks := repostasks.New(db)
+	svcTasks := svctasks.New(repoTasks, svcResources)
+	ctrlTasks := ctrltasks.New(svcTasks)
+
 	mux := http.NewServeMux()
 	ctrl.Register(mux)
 	ctrlResources.Register(mux)
+	ctrlLoc.Register(mux)
+	ctrlTasks.Register(mux)
 
 	addr := os.Getenv("HTTP_ADDR")
 	if addr == "" {

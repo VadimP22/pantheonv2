@@ -26,9 +26,19 @@ const loadedIcons = new Map<string, IconDefinition>()
 /** Иконка-заглушка для неизвестных имён. */
 export const fallbackMinecraftIcon: IconDefinition = barrier
 
-/** Снимает namespace (вида `minecraft:` / `minecraft_`) и приводит имя к канону. */
+/**
+ * Приводит имя иконки к канону библиотеки @imumd/mcicons.
+ *
+ * Снимает namespace (`minecraft:` / `minecraft_`), приводит к нижнему регистру
+ * и заменяет `_` на `-`: файлы определений в библиотеке названы в kebab-case
+ * (`acacia-fence-gate`), поэтому `minecraft:acacia_fence` → `acacia-fence`.
+ */
 export function normalizeMinecraftIconName(name: string): string {
-  return name.replace(/^minecraft(?::|_)/, '').toLowerCase()
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/^minecraft(?::|_)/, '')
+    .replace(/_/g, '-')
 }
 
 /** Возвращает уже загруженное определение, если иконка успела подгрузиться. */

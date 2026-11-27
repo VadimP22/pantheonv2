@@ -2,12 +2,15 @@
   width: 360px;
   height: 280px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .action {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .header {
@@ -39,4 +42,38 @@
   font-size: 12pt;
   color: var(--accent);
   letter-spacing: 0.08em;
+}
+
+.divider {
+  margin-top: 18px;
+}
+
+.counts {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 18px;
+}
+
+.countBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.countBlockRight {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.countValue {
+  font-size: 23px;
+  line-height: 1.2;
+}
+
+.countCaption {
+  font-size: 12pt;
+  color: var(--text-secondary);
 }

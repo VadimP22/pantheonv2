@@ -6,11 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	model "backend/model/stockpiles"
 )
 
-// Имена текстовых колонок таблицы stockpiles, используемые в CRUD-запросах.
+// Имена колонок таблицы stockpiles и ресурсов, используемые в CRUD-запросах.
 const (
 	colID        = "id"
 	colName      = "name"
@@ -19,9 +20,17 @@ const (
 	colX         = "x"
 	colY         = "y"
 	colZ         = "z"
+	colUpdatedAt = "updated_at"
+	// colItemCount и colItemTypeCount — вычисляемые колонки (не столбцы таблицы);
+	// используются как алиасы коррелированных подзапросов.
+	colItemCount     = "item_count"
+	colItemTypeCount = "item_type_count"
+	// colItemID — колонка item_id таблицы stockpile_resources.
+	colItemID = "item_id"
 )
 
-// listColumns перечисляет все колонки, сканируемые при чтении записи.
+// listColumns перечисляет все колонки (включая вычисляемые), сканируемые при
+// чтении записи. Порядок обязан совпадать с порядком выбора в buildSelect.
 var listColumns = []string{
 	colID,
 	colName,
@@ -30,6 +39,9 @@ var listColumns = []string{
 	colX,
 	colY,
 	colZ,
+	colUpdatedAt,
+	colItemCount,
+	colItemTypeCount,
 }
 
 // Repository обеспечивает CRUD-операции над таблицей stockpiles.
@@ -45,11 +57,13 @@ func New(db *sql.DB) *Repository {
 // Create вставляет новую запись и заполняет поле ID переданной структуры.
 // Поле ID на входе игнорируется (присваивается БД).
 func (r *Repository) Create(s *model.Stockpile) error {
-	const query = `INSERT INTO stockpiles (name, dimension, icon_name, x, y, z)
-		VALUES (?, ?, ?, ?, ?, ?)`
+	const query = `INSERT INTO stockpiles (name, dimension, icon_name, x, y, z, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?)`
+
+	now := time.Now().UTC()
 
 	res, err := r.db.Exec(query,
-		s.Name, s.Dimension, s.IconName, s.X, s.Y, s.Z,
+		s.Name, s.Dimension, s.IconName, s.X, s.Y, s.Z, formatTime(now),
 	)
 	if err != nil {
 		return fmt.Errorf("insert stockpile: %w", err)
@@ -61,6 +75,7 @@ func (r *Repository) Create(s *model.Stockpile) error {
 	}
 
 	s.ID = id
+	s.UpdatedAt = now
 	return nil
 }
 
@@ -69,8 +84,7 @@ func (r *Repository) Create(s *model.Stockpile) error {
 func (r *Repository) GetByID(id int64) (*model.Stockpile, error) {
 	query := buildSelect("WHERE " + colID + " = ?")
 
-	var s model.Stockpile
-	err := r.db.QueryRow(query, id).Scan(&s.ID, &s.Name, &s.Dimension, &s.IconName, &s.X, &s.Y, &s.Z)
+	s, err := scanStockpile(r.db.QueryRow(query, id))
 	if err != nil {
 		return nil, fmt.Errorf("get stockpile by id %d: %w", id, err)
 	}
@@ -91,9 +105,9 @@ func (r *Repository) List() ([]model.Stockpile, error) {
 
 	items := make([]model.Stockpile, 0)
 	for rows.Next() {
-		var s model.Stockpile
-		if err := rows.Scan(&s.ID, &s.Name, &s.Dimension, &s.IconName, &s.X, &s.Y, &s.Z); err != nil {
-			return nil, fmt.Errorf("scan stockpile: %w", err)
+		s, err := scanStockpile(rows)
+		if err != nil {
+			return nil, err
 		}
 		items = append(items, s)
 	}
@@ -128,9 +142,9 @@ func (r *Repository) ListPaged(limit, offset int) ([]model.Stockpile, error) {
 
 	items := make([]model.Stockpile, 0)
 	for rows.Next() {
-		var s model.Stockpile
-		if err := rows.Scan(&s.ID, &s.Name, &s.Dimension, &s.IconName, &s.X, &s.Y, &s.Z); err != nil {
-			return nil, fmt.Errorf("scan stockpile: %w", err)
+		s, err := scanStockpile(rows)
+		if err != nil {
+			return nil, err
 		}
 		items = append(items, s)
 	}
@@ -145,13 +159,14 @@ func (r *Repository) ListPaged(limit, offset int) ([]model.Stockpile, error) {
 // поэтому обновлять нечего.
 var ErrNoUpdateFields = errors.New("stockpiles: no fields to update")
 
-// Update обновляет у записи id только те поля input, которые не nil.
+// Update обновляет у записи id только те поля input, которые не nil,
+// и всегда обновляет время последнего изменения.
 // Возвращает true, если запись существовала и была изменена, false — если записи
-// не было либо значения оказались идентичны текущим (SQLite RowsAffected = 0).
+// не было (SQLite RowsAffected = 0).
 // Если в input нет ни одного не-nil поля, возвращается ErrNoUpdateFields.
 func (r *Repository) Update(id int64, in model.UpdateStockpileInput) (bool, error) {
-	sets := make([]string, 0, 6)
-	args := make([]any, 0, 7)
+	sets := make([]string, 0, 7)
+	args := make([]any, 0, 8)
 
 	if in.Name != nil {
 		sets = append(sets, colName+" = ?")
@@ -182,6 +197,10 @@ func (r *Repository) Update(id int64, in model.UpdateStockpileInput) (bool, erro
 		return false, ErrNoUpdateFields
 	}
 
+	// Время последнего изменения обновляется при любом успешном изменении записи.
+	sets = append(sets, colUpdatedAt+" = ?")
+	args = append(args, formatTime(time.Now()))
+
 	query := "UPDATE stockpiles SET " + strings.Join(sets, ", ") + " WHERE id = ?"
 	args = append(args, id)
 
@@ -196,6 +215,17 @@ func (r *Repository) Update(id int64, in model.UpdateStockpileInput) (bool, erro
 	}
 
 	return n > 0, nil
+}
+
+// Touch обновляет время последнего изменения записи.
+// Отсутствие записи не является ошибкой.
+func (r *Repository) Touch(id int64) error {
+	const query = `UPDATE stockpiles SET ` + colUpdatedAt + ` = ? WHERE id = ?`
+
+	if _, err := r.db.Exec(query, formatTime(time.Now()), id); err != nil {
+		return fmt.Errorf("touch stockpile %d: %w", id, err)
+	}
+	return nil
 }
 
 // Delete удаляет запись по идентификатору.
@@ -217,16 +247,39 @@ func (r *Repository) Delete(id int64) error {
 }
 
 // buildSelect собирает SELECT-запрос со списком всех колонок и опциональным хвостом
-// (WHERE/ORDER BY). Использует listColumns, чтобы списки не расходились с колонками.
+// (WHERE/ORDER BY). Обычные колонки перечисляются по имени, а вычисляемые
+// (item_count, item_type_count) — коррелированными подзапросами с теми же
+// алиасами. Порядок колонок обязан совпадать с порядком в listColumns.
 func buildSelect(tail string) string {
 	const from = "FROM stockpiles"
+	cols := append([]string{
+		colID, colName, colDimension, colIconName, colX, colY, colZ, colUpdatedAt,
+	}, itemCountExpr(), itemTypeCountExpr())
 	if tail == "" {
-		return "SELECT " + join(listColumns) + " " + from
+		return "SELECT " + join(cols) + " " + from
 	}
-	return "SELECT " + join(listColumns) + " " + from + " " + tail
+	return "SELECT " + join(cols) + " " + from + " " + tail
 }
 
-// join объединяет имена колонок через запятую.
+// itemCountExpr возвращает коррелированный подзапрос суммарного количества
+// единиц предметов запаса. Для запаса без ресурсов даёт 0 (не NULL).
+func itemCountExpr() string {
+	return "(" +
+		"SELECT COALESCE(SUM(r." + colItemCount + "), 0) " +
+		"FROM stockpile_resources r WHERE r.stockpile_id = stockpiles.id" +
+		") AS " + colItemCount
+}
+
+// itemTypeCountExpr возвращает коррелированный подзапрос количества различных
+// типов предметов запаса. Для запаса без ресурсов даёт 0 (не NULL).
+func itemTypeCountExpr() string {
+	return "(" +
+		"SELECT COALESCE(COUNT(DISTINCT r." + colItemID + "), 0) " +
+		"FROM stockpile_resources r WHERE r.stockpile_id = stockpiles.id" +
+		") AS " + colItemTypeCount
+}
+
+// join объединяет элементы списка через запятую.
 func join(cols []string) string {
 	s := ""
 	for i, c := range cols {
@@ -236,4 +289,30 @@ func join(cols []string) string {
 		s += c
 	}
 	return s
+}
+
+// scanStockpile читает одну строку выборки stockpiles, включая сырое значение
+// updated_at, и разбирает время в RFC3339. Пустое значение трактуется как
+// нулевое время (записи до заполнения миграцией).
+func scanStockpile(scanner interface{ Scan(dest ...any) error }) (model.Stockpile, error) {
+	var (
+		s         model.Stockpile
+		updatedAt string
+	)
+	if err := scanner.Scan(&s.ID, &s.Name, &s.Dimension, &s.IconName, &s.X, &s.Y, &s.Z, &updatedAt, &s.ItemCount, &s.ItemTypeCount); err != nil {
+		return model.Stockpile{}, fmt.Errorf("scan stockpile: %w", err)
+	}
+	if updatedAt != "" {
+		t, err := time.Parse(time.RFC3339, updatedAt)
+		if err != nil {
+			return model.Stockpile{}, fmt.Errorf("parse stockpile updated_at %q: %w", updatedAt, err)
+		}
+		s.UpdatedAt = t
+	}
+	return s, nil
+}
+
+// formatTime приводит время к UTC и форматирует в RFC3339 для хранения в БД.
+func formatTime(t time.Time) string {
+	return t.UTC().Format(time.RFC3339)
 }

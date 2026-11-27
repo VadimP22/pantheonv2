@@ -2,7 +2,12 @@ import type { CSSProperties } from 'react'
 import styles from './AppProgressBar.module.css'
 
 export interface AppProgressBarProps {
-  /** Текущее значение в процентах 0–100 (значения вне диапазона клампируются). */
+  /**
+   * Текущее значение в процентах 0–100.
+   * Значения вне диапазона клампируются по ширине; значение больше 100 считается
+   * переполнением — бар красится токенами `--progress-overflow-*` (золото в светлой
+   * теме, фиолетовый в тёмной). Внутренний край заливки всегда остаётся внутри трека.
+   */
   value: number
   /** Внешние классы для управления шириной/отступами (по умолчанию трек занимает 100% ширины). */
   className?: string
@@ -17,12 +22,13 @@ function clampValue(value: number): number {
 
 export function AppProgressBar({ value, className, ariaLabel = 'Прогресс' }: AppProgressBarProps) {
   const progress = clampValue(value)
-  const progressWidth = `${progress}%`
+  const overflow = value > 100
+  const innerWidth = `calc(${progress}% - 4px)`
 
-  const fillStyle: CSSProperties = { width: progressWidth }
-  const glintStyle: CSSProperties = { width: progressWidth }
+  const fillStyle: CSSProperties = { width: innerWidth }
+  const glintStyle: CSSProperties = { width: innerWidth }
 
-  const rootClassName = className ? `${styles.root} ${className}` : styles.root
+  const rootClassName = [styles.root, overflow ? styles.overflow : '', className ?? ''].join(' ').trim()
 
   return (
     <div

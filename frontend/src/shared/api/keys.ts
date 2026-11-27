@@ -1,4 +1,5 @@
 import type { ListStockpilesParams } from './stockpile.ts'
+import type { ListTasksParams } from './tasks.ts'
 
 /** Ключи TanStack Query для запросов к складам. */
 export const stockpileKeys = {
@@ -11,4 +12,11 @@ export const stockpileKeys = {
 export const stockpileResourceKeys = {
   all: ['stockpileResources'] as const,
   list: (stockpileId: number) => ['stockpileResources', 'list', stockpileId] as const,
+}
+
+/** Ключи TanStack Query для запросов задач. */
+export const taskKeys = {
+  all: ['tasks'] as const,
+  list: (params: ListTasksParams) => ['tasks', 'list', params] as const,
+  detail: (id: number) => ['tasks', 'detail', id] as const,
 }

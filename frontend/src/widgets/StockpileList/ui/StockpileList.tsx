@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import StockpileCard from '../../../entities/StockpileComponents/ui/StockpileCard.tsx'
 import AppText from '../../../shared/AppText/ui/AppText.tsx'
-import AppButton from '../../../shared/AppButton/ui/AppButton.tsx'
+import AppPaginator from '../../../shared/AppPaginator/ui/AppPaginator.tsx'
 import { formatCoordinates } from '../../../shared/lib/formatCoordinates.ts'
 import { useStockpiles } from '../hooks/useStockpiles.ts'
 import styles from './StockpileList.module.css'
@@ -49,24 +49,13 @@ export function StockpileList({ className }: StockpileListProps) {
             name={stockpile.name}
             coordinates={formatCoordinates(stockpile.x, stockpile.y, stockpile.z)}
             onDetailsClick={() => navigate(`/stockpiles/${stockpile.id}`)}
+            updatedAt={stockpile.updated_at}
+            itemCount={stockpile.item_count}
+            itemTypeCount={stockpile.item_type_count}
           />
         ))}
       </div>
-      <nav className={styles.paginator} aria-label="Пагинация">
-        <AppButton disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
-          {'‹ Назад'}
-        </AppButton>
-        <AppText className={styles.pageIndicator}>
-          {page} / {totalPages}
-        </AppText>
-        <AppButton
-          primary
-          disabled={page >= totalPages}
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-        >
-          {'Вперёд ›'}
-        </AppButton>
-      </nav>
+      <AppPaginator page={page} totalPages={totalPages} onPageChange={setPage} />
     </section>
   )
 }

@@ -1,0 +1,68 @@
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 4px;
+}
+
+.label {
+  font-size: 12pt;
+  color: var(--text-secondary);
+  padding: 0 2px;
+}
+
+.selectWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  background: var(--bg-card-secondary);
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+}
+
+.selectWrapper:hover {
+  background: var(--bg-card-secondary-hover);
+}
+
+.select {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 15px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 14pt;
+  line-height: 1;
+  appearance: none;
+  cursor: pointer;
+}
+
+.select:disabled {
+  color: var(--text-placeholder);
+  cursor: not-allowed;
+}
+
+.topEdge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--edge-top);
+  pointer-events: none;
+}
+
+.bottomEdge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--edge-bottom);
+  pointer-events: none;
+}

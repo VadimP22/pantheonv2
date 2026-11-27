@@ -5,13 +5,16 @@ package dto
 
 // StockpileDTO описывает складскую позицию в ответах API.
 type StockpileDTO struct {
-	ID        int64   `json:"id"`
-	Name      string  `json:"name"`
-	Dimension string  `json:"dimension"`
-	IconName  string  `json:"icon_name"`
-	X         float64 `json:"x"`
-	Y         float64 `json:"y"`
-	Z         float64 `json:"z"`
+	ID            int64   `json:"id"`
+	Name          string  `json:"name"`
+	Dimension     string  `json:"dimension"`
+	IconName      string  `json:"icon_name"`
+	X             float64 `json:"x"`
+	Y             float64 `json:"y"`
+	Z             float64 `json:"z"`
+	UpdatedAt     string  `json:"updated_at"`
+	ItemCount     int64   `json:"item_count"`
+	ItemTypeCount int64   `json:"item_type_count"`
 }
 
 // CreateStockpileInputDTO — тело запроса на создание складской позиции.

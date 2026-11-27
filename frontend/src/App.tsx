@@ -3,10 +3,13 @@ import AppLayout from './shared/AppLayout/ui/AppLayout.tsx'
 import Sidebar from './widgets/Sidebar/ui/Sidebar.tsx'
 import OverviewPage from './pages/Overview/ui/OverviewPage.tsx'
 import StockpilesPage from './pages/StockpilesPage/ui/StockpilesPage.tsx'
+import TasksPage from './pages/TasksPage/ui/TasksPage.tsx'
 import CreateStockpilePage from './pages/CreateStockpilePage/ui/CreateStockpilePage.tsx'
 import StockpileOverviewPage from './pages/StockpileOverviewPage/ui/StockpileOverviewPage.tsx'
 import DepositResourcePage from './pages/DepositResourcePage/ui/DepositResourcePage.tsx'
 import DepositSpecifiedResourcePage from './pages/DepositSpecifiedResourcePage/ui/DepositSpecifiedResourcePage.tsx'
+import CreateTaskPage from './pages/CreateTaskPage/ui/CreateTaskPage.tsx'
+import TaskDepositPage from './pages/TaskDepositPage/ui/TaskDepositPage.tsx'
 
 function App() {
   return (
@@ -14,6 +17,9 @@ function App() {
       <Route element={<AppLayout sidebar={<Sidebar />} />}>
         <Route index element={<OverviewPage />} />
         <Route path="stockpiles" element={<StockpilesPage />} />
+        <Route path="tasks" element={<TasksPage />} />
+        <Route path="tasks/create" element={<CreateTaskPage />} />
+        <Route path="tasks/:id/deposit" element={<TaskDepositPage />} />
         <Route path="stockpiles/create" element={<CreateStockpilePage />} />
         <Route path="stockpiles/:id" element={<StockpileOverviewPage />} />
         <Route path="stockpiles/:id/deposit" element={<DepositResourcePage />} />
