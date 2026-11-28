@@ -53,6 +53,7 @@ export function TasksList({ className }: TasksListProps) {
             itemCount={task.item_count}
             targetItemCount={task.target_item_count}
             done={task.done}
+            stockpileId={task.stockpile_id ?? undefined}
             onDepositClick={
               !task.is_checkbox && task.stockpile_id != null
                 ? () => navigate('/tasks/' + task.id + '/deposit')

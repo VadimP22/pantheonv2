@@ -1,6 +1,6 @@
-// Package item_localizations описывает модель данных для локализованных
-// названий предметов Minecraft.
-package item_localizations
+// Package item_registry описывает модель данных реестра предметов Minecraft.
+// Физически записи хранятся в таблице item_localizations (имя предмета на язык).
+package item_registry
 
 // ItemLocalization описывает запись таблицы item_localizations.
 // Пара (Lang, ItemID) уникальна: у предмета одно название на язык.

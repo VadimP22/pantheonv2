@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	model "backend/model/tasks"
+	regrepo "backend/repository/item_registry"
 	repo "backend/repository/tasks"
 	svcresources "backend/services/stockpile_resources"
 )
@@ -28,22 +29,37 @@ var (
 type Service struct {
 	repo      *repo.Repository
 	resources *svcresources.Service
+	reg       *regrepo.Repository
 }
 
-// New возвращает новый Service, работающий поверх предоставленного репозитория
-// и сервиса stockpile_resources.
-func New(r *repo.Repository, resources *svcresources.Service) *Service {
-	return &Service{repo: r, resources: resources}
+// New возвращает новый Service, работающий поверх предоставленного репозитория,
+// сервиса stockpile_resources и реестра предметов.
+func New(r *repo.Repository, resources *svcresources.Service, reg *regrepo.Repository) *Service {
+	return &Service{repo: r, resources: resources, reg: reg}
+}
+
+// ensureItemExists проверяет, что предмет itemID присутствует в реестре
+// предметов (таблица item_localizations); иначе — ErrInvalidInput («unknown item»).
+func (s *Service) ensureItemExists(itemID string) error {
+	exists, err := s.reg.ExistsByItemID(itemID)
+	if err != nil {
+		return fmt.Errorf("check item %q: %w", itemID, err)
+	}
+	if !exists {
+		return fmt.Errorf("%w: unknown item %q", ErrInvalidInput, itemID)
+	}
+	return nil
 }
 
 // Create создаёт новую задачу и возвращает её идентификатор.
 // Поле name обязательно (непустая строка).
 //
 // Правила по типу задачи:
-//   - is_checkbox = false (ресурс): обязателен item_id; icon_item_name
-//     заполняется сервисом из item_id (фронтенд его не собирает и не шлёт).
-//   - is_checkbox = true (чекбокс): обязателен icon_item_name;
-//     item_id и количества не требуются.
+//   - is_checkbox = false (ресурс): обязателен item_id, существующий в
+//     локализациях предметов; icon_item_name заполняется сервисом из item_id
+//     (фронтенд его не собирает и не шлёт).
+//   - is_checkbox = true (чекбокс): обязателен icon_item_name, существующий
+//     в локализациях предметов; item_id и количества не требуются.
 //
 // stockpile_id опционален в обоих случаях (nil — целевой склад не задан).
 func (s *Service) Create(in model.CreateTaskInput) (int64, error) {
@@ -56,10 +72,16 @@ func (s *Service) Create(in model.CreateTaskInput) (int64, error) {
 		if strings.TrimSpace(in.ItemID) == "" {
 			return 0, fmt.Errorf("%w: item_id is required for resource tasks", ErrInvalidInput)
 		}
+		if err := s.ensureItemExists(strings.TrimSpace(in.ItemID)); err != nil {
+			return 0, err
+		}
 		iconItemName = in.ItemID
 	} else {
 		if strings.TrimSpace(in.IconItemName) == "" {
 			return 0, fmt.Errorf("%w: icon_item_name is required for checkbox tasks", ErrInvalidInput)
+		}
+		if err := s.ensureItemExists(strings.TrimSpace(in.IconItemName)); err != nil {
+			return 0, err
 		}
 	}
 
@@ -163,6 +185,16 @@ func (s *Service) Update(id int64, in model.UpdateTaskInput) (model.Task, error)
 	if in.IsCheckbox != nil && *in.IsCheckbox {
 		if in.IconItemName == nil || strings.TrimSpace(*in.IconItemName) == "" {
 			return model.Task{}, fmt.Errorf("%w: icon_item_name is required for checkbox tasks", ErrInvalidInput)
+		}
+	}
+	if in.ItemID != nil && strings.TrimSpace(*in.ItemID) != "" {
+		if err := s.ensureItemExists(strings.TrimSpace(*in.ItemID)); err != nil {
+			return model.Task{}, err
+		}
+	}
+	if in.IconItemName != nil && strings.TrimSpace(*in.IconItemName) != "" {
+		if err := s.ensureItemExists(strings.TrimSpace(*in.IconItemName)); err != nil {
+			return model.Task{}, err
 		}
 	}
 	if in.Name != nil && strings.TrimSpace(*in.Name) == "" {

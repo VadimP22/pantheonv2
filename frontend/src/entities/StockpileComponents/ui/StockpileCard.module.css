@@ -6,6 +6,15 @@
   flex-direction: column;
 }
 
+/* Внутренний контейнер AppCard (.content): растягиваем на высоту карточки
+   и делаем flex-колонкой, чтобы .action прижимался к низу. */
+.root > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 12px;
+}
+
 .action {
   margin-top: auto;
   display: flex;
@@ -32,7 +41,7 @@
 }
 
 .title {
-  margin-top: 18px;
+  margin-top: 12px;
   font-size: 23px;
   line-height: 1.2;
 }
@@ -45,14 +54,14 @@
 }
 
 .divider {
-  margin-top: 18px;
+  margin-top: 12px;
 }
 
 .counts {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-top: 18px;
+  margin-top: 12px;
 }
 
 .countBlock {

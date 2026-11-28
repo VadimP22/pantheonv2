@@ -1,11 +1,13 @@
-// Package item_localizations предоставляет доступ к данным таблицы item_localizations.
-package item_localizations
+// Package item_registry предоставляет доступ к реестру предметов Minecraft
+// (таблица item_localizations). Запись данных выполняется через langseed,
+// поэтому репозиторий read-only.
+package item_registry
 
 import (
 	"database/sql"
 	"fmt"
 
-	model "backend/model/item_localizations"
+	model "backend/model/item_registry"
 )
 
 // Имена колонок таблицы item_localizations, используемые в запросах.
@@ -25,7 +27,7 @@ var listColumns = []string{
 }
 
 // Repository обеспечивает операции чтения над таблицей item_localizations.
-// Запись данных выполняется через миграции, поэтому методов изменения нет.
+// Запись данных выполняется через langseed, поэтому методов изменения нет.
 type Repository struct {
 	db *sql.DB
 }
@@ -48,6 +50,18 @@ func (r *Repository) GetByItemID(lang, itemID string) (*model.ItemLocalization, 
 	}
 
 	return &rec, nil
+}
+
+// ExistsByItemID проверяет, что предмет с указанным id присутствует
+// в реестре (на любом языке).
+func (r *Repository) ExistsByItemID(itemID string) (bool, error) {
+	const query = `SELECT EXISTS (SELECT 1 FROM item_localizations WHERE item_id = ?)`
+
+	var exists bool
+	if err := r.db.QueryRow(query, itemID).Scan(&exists); err != nil {
+		return false, fmt.Errorf("check item exists item=%q: %w", itemID, err)
+	}
+	return exists, nil
 }
 
 // buildSelect собирает SELECT-запрос со списком всех колонок и опциональным хвостом

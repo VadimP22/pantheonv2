@@ -15,6 +15,8 @@
   --bg-card-secondary: #e0e2d4;
   --bg-card-secondary-hover: #e7e9dc;
   --bg-input: #fbfaf3;
+  --bg-banner: #d8e4c9;
+  --text-banner: #475c35;
 
   /* Слоты инвентаря */
   --bg-slot: #8e9781;
@@ -72,6 +74,8 @@
   --bg-card-secondary: #150c27;
   --bg-card-secondary-hover: #201538;
   --bg-input: #140b26;
+  --bg-banner: #1d2b47;
+  --text-banner: #c7d4ea;
 
   /* Слоты инвентаря */
   --bg-slot: #0f0a1f;

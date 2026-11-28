@@ -15,16 +15,16 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "modernc.org/sqlite"
 
-	ctrlloc "backend/controller/item_localizations"
+	ctrlreg "backend/controller/item_registry"
 	ctrlresources "backend/controller/stockpile_resources"
 	ctrlstockpiles "backend/controller/stockpiles"
 	ctrltasks "backend/controller/tasks"
 	"backend/lib/langseed"
-	repoloc "backend/repository/item_localizations"
+	reporeg "backend/repository/item_registry"
 	reporesources "backend/repository/stockpile_resources"
 	repostockpiles "backend/repository/stockpiles"
 	repostasks "backend/repository/tasks"
-	svcloc "backend/services/item_localizations"
+	svcreg "backend/services/item_registry"
 	svcresources "backend/services/stockpile_resources"
 	svcstockpiles "backend/services/stockpiles"
 	svctasks "backend/services/tasks"
@@ -95,22 +95,22 @@ func run() error {
 	svc := svcstockpiles.New(repo)
 	ctrl := ctrlstockpiles.New(svc)
 
+	repoReg := reporeg.New(db)
+	svcReg := svcreg.New(repoReg)
+	ctrlReg := ctrlreg.New(svcReg)
+
 	repoResources := reporesources.New(db)
-	svcResources := svcresources.New(repoResources, repo)
+	svcResources := svcresources.New(repoResources, repo, repoReg)
 	ctrlResources := ctrlresources.New(svcResources)
 
-	repoLoc := repoloc.New(db)
-	svcLoc := svcloc.New(repoLoc)
-	ctrlLoc := ctrlloc.New(svcLoc)
-
 	repoTasks := repostasks.New(db)
-	svcTasks := svctasks.New(repoTasks, svcResources)
+	svcTasks := svctasks.New(repoTasks, svcResources, repoReg)
 	ctrlTasks := ctrltasks.New(svcTasks)
 
 	mux := http.NewServeMux()
 	ctrl.Register(mux)
 	ctrlResources.Register(mux)
-	ctrlLoc.Register(mux)
+	ctrlReg.Register(mux)
 	ctrlTasks.Register(mux)
 
 	addr := os.Getenv("HTTP_ADDR")

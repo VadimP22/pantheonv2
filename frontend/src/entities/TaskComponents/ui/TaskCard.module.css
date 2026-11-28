@@ -6,6 +6,16 @@
   flex-direction: column;
 }
 
+/* Внутренний контейнер AppCard (.content): растягиваем на высоту карточки
+   и делаем flex-колонкой, чтобы .bottom прижимался к низу.
+   Консистентно со StockpileCard. */
+.root > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 12px;
+}
+
 .header {
   display: flex;
   align-items: center;
@@ -25,7 +35,7 @@
 }
 
 .title {
-  margin-top: 18px;
+  margin-top: 12px;
   font-size: 23px;
   line-height: 1.2;
 }
@@ -40,7 +50,22 @@
   margin-top: auto;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Кнопка-ссылка на склад: AppTextButton уже даёт акцентный цвет и 12pt */
+.stockpileLink {
+  letter-spacing: 0.08em;
+}
+
+.noStockpile {
+  font-size: 12pt;
+  color: var(--text-secondary);
+}
+
+.statusRow {
+  margin-top: 8px;
 }
 
 .statusDone {
@@ -59,7 +84,6 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  flex: 1;
   min-width: 0;
 }
 

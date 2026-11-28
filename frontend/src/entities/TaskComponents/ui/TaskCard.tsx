@@ -1,9 +1,11 @@
+import { useNavigate } from 'react-router-dom'
 import { AppCard } from '../../../shared/AppCard/ui/AppCard.tsx'
 import { AppTitle } from '../../../shared/AppTitle/ui/AppTitle.tsx'
 import { AppText } from '../../../shared/AppText/ui/AppText.tsx'
 import { AppProgressBar } from '../../../shared/AppProgressBar/ui/AppProgressBar.tsx'
 import AppMinecraftIcon from '../../../shared/AppMinecraftIcon/ui/AppMinecraftIcon.tsx'
 import AppTextButton from '../../../shared/AppTextButton/ui/AppTextButton.tsx'
+import { useTaskStockpile } from '../hooks/useTaskStockpile.ts'
 import styles from './TaskCard.module.css'
 
 export interface TaskCardProps {
@@ -23,6 +25,8 @@ export interface TaskCardProps {
   done?: boolean
   /** Внешние классы для корневой карточки. */
   className?: string
+  /** Идентификатор целевого склада; undefined — склад не задан. */
+  stockpileId?: number
   /** Обработчик нажатия на кнопку «Внести»; undefined — кнопка не рендерится */
   onDepositClick?: () => void
   /** Обработчик нажатия на кнопку «Завершить»; undefined — кнопка не рендерится */
@@ -30,8 +34,8 @@ export interface TaskCardProps {
 }
 
 /**
- * Карточка задачи: иконка, название, описание и нижний блок —
- * либо статус «Выполнено / Не выполнено», либо прогресс до цели.
+ * Карточка задачи: иконка, название, описание, под описанием — статус
+ * «Выполнено / Не выполнено» или прогресс до цели; внизу — ссылка на склад.
  */
 export function TaskCard({
   name,
@@ -42,10 +46,14 @@ export function TaskCard({
   targetItemCount,
   done,
   className,
+  stockpileId,
   onDepositClick,
   onCompleteClick,
 }: TaskCardProps) {
   const rootClassName = className ? `${styles.root} ${className}` : styles.root
+  const navigate = useNavigate()
+  const targetStockpileId = stockpileId ?? 0
+  const { data: stockpile } = useTaskStockpile(targetStockpileId)
   const progress = targetItemCount && targetItemCount > 0
     ? Math.round(((itemCount ?? 0) / targetItemCount) * 100)
     : 0
@@ -73,7 +81,7 @@ export function TaskCard({
         {name}
       </AppTitle>
       {description && <AppText className={styles.description}>{description}</AppText>}
-      <div className={styles.bottom}>
+      <div className={styles.statusRow}>
         {isCheckbox ? (
           <AppText className={done ? styles.statusDone : styles.statusPending}>
             {done ? 'Выполнено' : 'Не выполнено'}
@@ -85,6 +93,18 @@ export function TaskCard({
               {itemCount ?? 0} / {targetItemCount ?? 0}
             </AppText>
           </div>
+        )}
+      </div>
+      <div className={styles.bottom}>
+        {targetStockpileId > 0 ? (
+          <AppTextButton
+            className={styles.stockpileLink}
+            onClick={() => navigate(`/stockpiles/${targetStockpileId}`)}
+          >
+            {stockpile?.name ?? `Склад #${targetStockpileId}`}
+          </AppTextButton>
+        ) : (
+          <AppText className={styles.noStockpile}>{'Нет склада'}</AppText>
         )}
       </div>
     </AppCard>

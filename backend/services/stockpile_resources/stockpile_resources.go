@@ -13,6 +13,7 @@ import (
 	"sync"
 
 	model "backend/model/stockpile_resources"
+	regrepo "backend/repository/item_registry"
 	repo "backend/repository/stockpile_resources"
 	stockpilesrepo "backend/repository/stockpiles"
 )
@@ -31,14 +32,15 @@ var (
 type Service struct {
 	resources  *repo.Repository
 	stockpiles *stockpilesrepo.Repository
+	reg        *regrepo.Repository
 	// mu сериализует операции mutate/read, чтобы deposit/withdraw не гонялись
 	// между чтением текущего количества и записью нового.
 	mu sync.Mutex
 }
 
-// New возвращает новый Service поверх репозиториев ресурсов и складов.
-func New(resources *repo.Repository, stockpiles *stockpilesrepo.Repository) *Service {
-	return &Service{resources: resources, stockpiles: stockpiles}
+// New возвращает новый Service поверх репозиториев ресурсов, складов и реестра предметов.
+func New(resources *repo.Repository, stockpiles *stockpilesrepo.Repository, reg *regrepo.Repository) *Service {
+	return &Service{resources: resources, stockpiles: stockpiles, reg: reg}
 }
 
 // Deposit вносит count единиц ресурса itemID на склад stockpileID.
@@ -51,6 +53,14 @@ func (s *Service) Deposit(stockpileID int64, itemID string, count int64) (model.
 	itemID, err := s.validate(stockpileID, itemID, count)
 	if err != nil {
 		return model.StockpileResource{}, err
+	}
+
+	exists, err := s.reg.ExistsByItemID(itemID)
+	if err != nil {
+		return model.StockpileResource{}, fmt.Errorf("check item %q: %w", itemID, err)
+	}
+	if !exists {
+		return model.StockpileResource{}, fmt.Errorf("%w: unknown item %q", ErrInvalidInput, itemID)
 	}
 
 	rec, err := s.find(stockpileID, itemID)
